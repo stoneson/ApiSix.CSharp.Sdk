@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0BBFA472-B470-429F-BF0B-BA33BE3B48F2}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiSix.CSharp.Sdk.Test", "ApiSix.CSharp.Sdk.Test\ApiSix.CSharp.Sdk.Test.csproj", "{FF0FCD03-C3A3-4D40-A318-84541690E8F1}"

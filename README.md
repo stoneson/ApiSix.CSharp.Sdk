@@ -3,6 +3,9 @@
 More detailed documentation please refer to:
 - https://apisix.apache.org/zh/docs/apisix/admin-api/
 
+# Apache APISIX 安装
+- https://github.com/apache/apisix-docker
+- https://github.com/apache/apisix-docker/example
 
 # Example
 
