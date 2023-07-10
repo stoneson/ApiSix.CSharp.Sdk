@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<Description>.NET Sdk for Apache APISIX</Description>
+		<!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+		<TargetFrameworks>net45;net462;netstandard2.0;netstandard2.1;net5.0;net6.0</TargetFrameworks>
+		
+	</PropertyGroup>
+	<PropertyGroup>
+		<!-- Set versions for all projects. Avoids warnings from non-preview projects referencing preview projects -->
+		<Version>3.3.0</Version>
+		<AssemblyVersion>3.3.0.0</AssemblyVersion>
+		<FileVersion>3.3.0.0</FileVersion>
+		<Product>.NET Sdk for Apache APISIX</Product>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+		<SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+
+		<!-- Don't make missing XML docs a fatal build error, but still surface so we have visibility into undocumented APIs. -->
+		<!--<WarningsNotAsErrors>$(WarningsNotAsErrors);CS1591</WarningsNotAsErrors>-->
+
+		<!-- Ignore warning about lowercase identifiers. Caused by generated source from Protobuf. -->
+		<!-- TODO(JamesNK): Remove when Protobuf is updated and samples use a version of Grpc.AspNetCore that brings in Grpc.Tools 2.49.0 or later. -->
+		<!--<NoWarn>$(NoWarn);CS8981</NoWarn>-->
+
+		<!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<LangVersion>8.0</LangVersion>
+		<!--<Nullable>enable</Nullable>-->
+		<!-- grpc-dotnet global usings break the build. -->
+		<ImplicitUsings>disable</ImplicitUsings>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+		<GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+		<GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+	</PropertyGroup>
+
+	<PropertyGroup Label="NuGet package definition" Condition=" '$(Configuration)' == 'Release' ">
+		<DevelopmentDependency>true</DevelopmentDependency>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<PackageId>ApiSix.Sharp.Sdk</PackageId>
+		<Authors>Stoneson</Authors>
+		<Copyright>Copyright 2023 Stoneson</Copyright>
+		<PackageIcon>favicon.png</PackageIcon>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/stoneson/ApiSix.CSharp.Sdk</PackageProjectUrl>
+
+		<PackageTags>aspnetcore;Apache;APISIX;getway;网关;微服务;micro-services; Micro Service;net6.0;net45;net461;</PackageTags>
+
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="model\response\Wrap.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+		<None Include="favicon.png" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net45'OR '$(TargetFramework)' == 'net462' ">
+		<Reference Include="System.Web" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+</Project>
