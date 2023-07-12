@@ -877,7 +877,7 @@ namespace ApiSix.CSharp
         {
             if (type == typeof(Guid))
             {
-                if (!(value is  Guid guid)) guid = Guid.Empty;
+                if (!(value is Guid guid)) guid = Guid.Empty;
                 Write(guid.ToByteArray(), -1);
                 return true;
             }
@@ -1121,7 +1121,7 @@ namespace ApiSix.CSharp
 
             // 目标字段必须是整型
             var tc = Type.GetTypeCode(type);
-            if (tc  >= TypeCode.SByte && tc <= TypeCode.UInt64) return mi;
+            if (tc >= TypeCode.SByte && tc <= TypeCode.UInt64) return mi;
 
             return null;
         }
@@ -1559,10 +1559,10 @@ namespace ApiSix.CSharp
         /// <returns></returns>
         public override Boolean Write(Object value, Type type)
         {
-            if (!type.As<IList>() && !(value is  IList)) return false;
+            if (!type.As<IList>() && !(value is IList)) return false;
 
             // 先写入长度
-            if (!(value is  IList list) || list.Count == 0)
+            if (!(value is IList list) || list.Count == 0)
             {
                 Host.WriteSize(0);
                 return true;
@@ -1634,7 +1634,7 @@ namespace ApiSix.CSharp
         /// <returns></returns>
         public override Boolean Write(Object value, Type type)
         {
-            if (!(value is  IDictionary dic)) return false;
+            if (!(value is IDictionary dic)) return false;
 
             // 先写入长度
             if (dic.Count == 0)
@@ -1697,7 +1697,7 @@ namespace ApiSix.CSharp
     }
     #endregion
 #if __WIN__
-#region BinaryColor
+    #region BinaryColor
     /// <summary>颜色处理器。</summary>
     public class BinaryColor : BinaryHandlerBase
     {
