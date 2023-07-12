@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Diagnostics;
 
 namespace ApiSix.CSharp
 {
@@ -43,5 +44,4 @@ namespace ApiSix.CSharp
         /// <returns></returns>
         Object this[String key] { get; set; }
     }
-   
 }

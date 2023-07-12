@@ -1641,7 +1641,7 @@ namespace ApiSix.CSharp
         #endregion
 
         #region 持久化
-        private const String MAGIC = "apisixCache";
+        private const String MAGIC = "ApiSix_Cache";
         private const Byte _Ver = 1;
         /// <summary>保存到数据流</summary>
         /// <param name="stream"></param>

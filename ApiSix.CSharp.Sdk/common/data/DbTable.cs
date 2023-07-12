@@ -179,10 +179,13 @@ namespace ApiSix.CSharp
         /// <summary>转换为DataTable</summary>
         /// <param name="dataTable">数据表</param>
         /// <returns></returns>
-        public DataTable Write(DataTable dataTable)
+        public DataTable Write(DataTable dataTable = null)
         {
-            if (dataTable == null) throw new ArgumentNullException(nameof(dataTable));
-
+            if (dataTable == null)
+            {
+                dataTable = new DataTable("Table");
+                //throw new ArgumentNullException(nameof(dataTable));
+            }
             var cs = Columns;
             var ts = Types;
             for (var i = 0; i < cs.Length; i++)
@@ -207,7 +210,7 @@ namespace ApiSix.CSharp
 
         #region 二进制读取
         private const Byte _Ver = 2;
-
+        private const string _Head = "ApiSix_DbTable";
         /// <summary>从数据流读取</summary>
         /// <param name="stream"></param>
         public void Read(Stream stream)
@@ -230,8 +233,8 @@ namespace ApiSix.CSharp
         public void ReadHeader(Binary bn)
         {
             // 头部，幻数、版本和标记
-            var magic = bn.ReadBytes(14).ToStr();
-            if (magic != "ApiSixDbTable") throw new InvalidDataException();
+            var magic = bn.ReadBytes(_Head.Length).ToStr();
+            if (magic != _Head) throw new InvalidDataException();
 
             var ver = bn.Read<Byte>();
             _ = bn.Read<Byte>();
@@ -333,7 +336,7 @@ namespace ApiSix.CSharp
             var ts = Types;
 
             // 头部，幻数、版本和标记
-            bn.Write("ApiSixDbTable".GetBytes(), 0, 14);
+            bn.Write(_Head.GetBytes(), 0, _Head.Length);
             bn.Write(_Ver);
             bn.Write(0);
 

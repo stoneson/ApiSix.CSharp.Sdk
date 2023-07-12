@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace ApiSix.CSharp
 {
@@ -19,7 +20,30 @@ namespace ApiSix.CSharp
         /// apiSix admin url
         /// </summary>
         public String Endpoint { get; set; } = "127.0.0.1:9180";
-      
+
+        /// <summary>系统主程序集</summary>
+        public static AssemblyX SysAssembly
+        {
+            get
+            {
+                try
+                {
+                    var asm = AssemblyX.Entry;
+                    if (asm != null) return asm;
+
+                    var list = AssemblyX.GetMyAssemblies();
+
+                    // 最后编译那一个
+                    list = list.OrderByDescending(e => e.Compile)
+                        .ThenByDescending(e => e.Name.EndsWithIgnoreCase("Web"))
+                        .ToList();
+
+                    return list.FirstOrDefault();
+
+                }
+                catch { return null; }
+            }
+        }
         #endregion
     }
 }

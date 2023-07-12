@@ -18,13 +18,14 @@ namespace ApiSix.CSharp.Sdk.Test
             Setting.Current.ApiKey = "edd1c9f034335f136f87ad84b625c8f1";
             Setting.Current.Save();
 
+
             adminClient = new AdminClient();
         }
 
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            Assert.Pass("TODO");
         }
         [Test]
         public void testUpstream()
