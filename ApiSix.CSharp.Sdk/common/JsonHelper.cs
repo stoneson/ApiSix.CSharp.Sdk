@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Linq;
@@ -50,7 +51,14 @@ namespace ApiSix.CSharp
             }
             return JsonConvert.DeserializeObject(UTF8Encoding.UTF8.GetString(value), type, timeFormat);
         }
-
+        public static T ToObject<T>(this string value)
+        {
+            return DeserializeObjectByJson<T>(value);
+        }
+        public static object ToObject(this string value, Type type)
+        {
+            return DeserializeObjectByJson(value, type);
+        }
         public static object DeserializeObjectByJson(this string value, Type type)
         {
             if (value==null) return null;
@@ -67,7 +75,10 @@ namespace ApiSix.CSharp
         {
             return (T)DeserializeObjectByJson(value, typeof(T));
         }
-
+        public static string ToJson(this object value)
+        {
+            return SerializeObjectToJson(value);
+        }
         public static string SerializeObjectToJson(this object value)
         {
             if (value == null) return "";
@@ -180,116 +191,6 @@ namespace ApiSix.CSharp
                 }
             }
             return entity;
-        }
-        /// <summary>
-        /// 将对象转字典集合
-        /// </summary>
-        /// <typeparam name="TValue"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static Dictionary<string, object> ToDictionary(this object obj, Dictionary<string, object> dic = null)
-        {
-            if (dic == null)
-                dic = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
-            // 如果对象为空，则返回空字典
-            if (obj == null) return dic;
-            if (obj is Newtonsoft.Json.Linq.JObject _jObject)//JSON
-            {
-                foreach (var item in _jObject)
-                {
-                    var val = item.Value as Newtonsoft.Json.Linq.JValue;
-                    dic[item.Key] = val != null ? val.Value : null;
-                }
-            }
-            else if (obj is System.Dynamic.ExpandoObject _eObject)//ExpandoObject
-            {
-                foreach (var item in _eObject)
-                {
-                    dic[item.Key] = item.Value;
-                }
-            }
-            else if (obj is System.Collections.Generic.IDictionary<string, string> _dicObjects)//Dictionary
-            {
-                foreach (var item in _dicObjects)
-                {
-                    dic[item.Key] = item.Value;
-                }
-            }
-            else if (obj is System.Collections.Generic.IDictionary<string, object> _dicObjecto)//Dictionary
-            {
-                foreach (var item in _dicObjecto)
-                {
-                    dic[item.Key] = item.Value;
-                }
-            }
-            else if (obj is System.Collections.IDictionary _dicObject)//IDictionary
-            {
-                foreach (object key in _dicObject.Keys)
-                {
-                    dic[key.ToString()] = _dicObject[key];
-                }
-            }
-            else if (obj is DataRow _drObject)
-            {
-                for (int j = 0; j < _drObject.Table.Columns.Count; j++)
-                {
-                    dic[_drObject.Table.Columns[j].ColumnName] = _drObject[j];
-                }
-            }
-            else if (obj is DataTable _dtObject)
-            {
-                if (_dtObject.Rows.Count > 0 && _dtObject.Columns.Count > 0)
-                {
-                    if (_dtObject.Rows.Count == 1)
-                    {
-                        return _dtObject.Rows[0].ToDictionary(dic);
-                    }
-                    else
-                    {
-                        var dicr = new Dictionary<string, object>();
-                        for (var i = 0; i < _dtObject.Rows.Count; i++)
-                        {
-                            var dr = _dtObject.Rows[i];
-                            dicr["__Row__" + i] = dr.ToDictionary(dic);
-                        }
-                    }
-                }
-            }
-            else if (obj is System.Data.DataRowView _drvObject)
-            {
-                for (int j = 0; j < _drvObject.Row.Table.Columns.Count; j++)
-                {
-                    dic[_drvObject.Row.Table.Columns[j].ColumnName] = _drvObject.Row[j];
-                }
-            }
-            else//实体
-            {
-                // 如果不是类类型或匿名类型，则返回空字典
-                var type = obj.GetType();
-                if (!(type.IsClass || type.IsAnonymous())) return dic;
-
-                // 获取所有属性
-                var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                // 如果实例公开属性为空，则返回空字典
-                if (properties.Length == 0) return dic;
-                // 遍历公开属性
-                foreach (var property in properties)
-                {
-                    var value = property.GetValue(obj, null);
-                    dic[property.Name] = value;
-                }
-                var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-                // 如果实例公开属性为空，则返回空字典
-                if (fields.Length == 0) return dic;
-                // 遍历公开属性
-                foreach (var field in fields)
-                {
-                    var value = field.GetValue(obj);
-                    dic[field.Name] = value;
-                }
-            }
-            return dic;
         }
         /// <summary>
         /// 判断是否是匿名类型

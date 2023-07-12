@@ -174,5 +174,90 @@ namespace ApiSix.CSharp.model
             },
             "filter_func": ""                     # 用户自定义的过滤函数，非必填
         }
+
+    0. 创建一个路由：
+        curl http://127.0.0.1:9180/apisix/admin/routes/1 \
+        -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -i -d '
+        {
+            "uri": "/index.html",
+            "hosts": ["foo.com", "*.bar.com"],
+            "remote_addrs": ["127.0.0.0/8"],
+            "methods": ["PUT", "GET"],
+            "enable_websocket": true,
+            "upstream": {
+                "type": "roundrobin",
+                "nodes": {
+                    "127.0.0.1:1980": 1
+                }
+            }
+        }'
+
+    1. 创建一个有效期为 60 秒的路由，过期后自动删除：
+        curl 'http://127.0.0.1:9180/apisix/admin/routes/2?ttl=60' \
+        -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -i -d '
+        {
+            "uri": "/aa/index.html",
+            "upstream": {
+                "type": "roundrobin",
+                "nodes": {
+                    "127.0.0.1:1980": 1
+                }
+            }
+        }'
+
+    2. 在路由中新增一个上游节点：
+        curl http://127.0.0.1:9180/apisix/admin/routes/1 \
+        -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PATCH -i -d '
+        {
+            "upstream": {
+                "nodes": {
+                    "127.0.0.1:1981": 1
+                }
+            }
+        }'
+    执行成功后，上游节点将更新为：
+        {
+            "127.0.0.1:1980": 1,
+            "127.0.0.1:1981": 1
+        }
+
+    3. 更新路由中上游节点的权重：
+        curl http://127.0.0.1:9180/apisix/admin/routes/1 \
+        -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PATCH -i -d '
+        {
+            "upstream": {
+                "nodes": {
+                    "127.0.0.1:1981": 10
+                }
+            }
+        }'
+    执行成功后，上游节点将更新为：
+        {
+            "127.0.0.1:1980": 1,
+            "127.0.0.1:1981": 10
+        }
+
+
+    4. 从路由中删除一个上游节点：
+        curl http://127.0.0.1:9180/apisix/admin/routes/1 \
+        -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PATCH -i -d '
+        {
+            "upstream": {
+                "nodes": {
+                    "127.0.0.1:1980": null
+                }
+            }
+        }'
+    执行成功后，Upstream nodes 将更新为：
+        {
+            "127.0.0.1:1981": 10
+        }
+
+    5. 使用 sub path 更新路由中的 methods：
+        curl http://127.0.0.1:9180/apisix/admin/routes/1/methods \
+        -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PATCH -i -d '["POST", "DELETE", "PATCH"]'
+    执行成功后，methods 将不保留原来的数据，更新为：
+        ["POST", "DELETE", "PATCH"]
+
      **/
 }

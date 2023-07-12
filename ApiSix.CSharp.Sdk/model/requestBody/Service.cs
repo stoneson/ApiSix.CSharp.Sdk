@@ -32,7 +32,7 @@ namespace ApiSix.CSharp.model
         public Dictionary<String, Plugin> plugins { get; set; }
         /// <summary>
         /// Upstream 配置
-        /// upstream_id 二选一
+        /// 与 upstream_id 二选一
         /// </summary>
         [JsonProperty("upstream")]
         public Upstream upstream { get; set; }

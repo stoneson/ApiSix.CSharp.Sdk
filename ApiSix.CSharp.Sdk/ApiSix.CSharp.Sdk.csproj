@@ -59,18 +59,23 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="common\Configuration\ApolloConfigProvider.cs" />
+	  <Compile Remove="common\Configuration\HttpConfigProvider.cs" />
 	  <Compile Remove="model\response\Wrap.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 		<None Include="favicon.png" Pack="true" PackagePath="\" />
 		<None Include="README.md" Pack="true" PackagePath="\" />
-		<None Include="$(SolutionDir)LICENSE"   Pack="true" PackagePath="\" />
+		<None Include="$(SolutionDir)LICENSE" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45'OR '$(TargetFramework)' == 'net462' ">
 		<Reference Include="System.Web" />
+		<Reference Include="System.IO.Compression" />
+		<Reference Include="System.Management" />
+		<Reference Include="Microsoft.VisualBasic" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

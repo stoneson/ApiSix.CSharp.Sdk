@@ -20,6 +20,9 @@ namespace ApiSix.CSharp
     /// </summary>
     public class AdminClient : BaseClient
     {
+        public AdminClient() : this(Setting.Current.Endpoint, Setting.Current.Version, Setting.Current.ApiKey)
+        {
+        }
         public AdminClient(Profile profile) : base(profile)
         {
         }
@@ -93,12 +96,12 @@ namespace ApiSix.CSharp
         /// <param name="route"></param>
         /// <returns></returns>
         /// <exception cref="ApisixSDKExcetion"></exception>
-        public Item<Route> patchRoute(String id, object route)
+        public Item<Route> patchRoute(String id, object route, string subPath = "")
         {
             try
             {
                 //route = resolveUpstream(route);
-                return this.patchById<Route>(id, route, "routes");
+                return this.patchById<Route>(id, route, "routes", subPath);
             }
             catch (ApisixSDKExcetion e)
             {
@@ -290,12 +293,12 @@ namespace ApiSix.CSharp
         /// <param name="service"></param>
         /// <returns></returns>
         /// <exception cref="ApisixSDKExcetion"></exception>
-        public Item<Service> patchService(String id, object service)
+        public Item<Service> patchService(String id, object service, string subPath = "")
         {
             try
             {
                 //service = resolveUpstream(service);
-                return this.patchById<Service>(id, service, "services");
+                return this.patchById<Service>(id, service, "services", subPath);
             }
             catch (ApisixSDKExcetion e)
             {
@@ -370,9 +373,9 @@ namespace ApiSix.CSharp
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ApisixSDKExcetion"></exception>
-        public Item<Upstream> patchUpstream(String id, object upstream)
+        public Item<Upstream> patchUpstream(String id, object upstream, string subPath = "")
         {
-            return this.patchById<Upstream>(id, upstream, "upstreams");
+            return this.patchById<Upstream>(id, upstream, "upstreams", subPath);
         }
         #endregion
 
@@ -586,9 +589,9 @@ namespace ApiSix.CSharp
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ApisixSDKExcetion"></exception>
-        public Item<GlobalRule> patchGlobalRule(String id, object globalRule)
+        public Item<GlobalRule> patchGlobalRule(String id, object globalRule, string subPath = "")
         {
-            return this.patchById<GlobalRule>(id, globalRule, "global_rules");
+            return this.patchById<GlobalRule>(id, globalRule, "global_rules", subPath);
         }
         #endregion
         #region consumer_groups
@@ -637,9 +640,9 @@ namespace ApiSix.CSharp
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ApisixSDKExcetion"></exception>
-        public Item<ConsumerGroup> patchConsumerGroup(String id, object consumerGroup)
+        public Item<ConsumerGroup> patchConsumerGroup(String id, object consumerGroup, string subPath = "")
         {
-            return this.patchById<ConsumerGroup>(id, consumerGroup, "consumer_groups");
+            return this.patchById<ConsumerGroup>(id, consumerGroup, "consumer_groups", subPath);
         }
         #endregion
         #region plugin_configs
@@ -688,9 +691,9 @@ namespace ApiSix.CSharp
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ApisixSDKExcetion"></exception>
-        public Item<PluginConfig> patchPluginConfig(String id, object pluginConfig)
+        public Item<PluginConfig> patchPluginConfig(String id, object pluginConfig, string subPath = "")
         {
-            return this.patchById<PluginConfig>(id, pluginConfig, "plugin_configs");
+            return this.patchById<PluginConfig>(id, pluginConfig, "plugin_configs", subPath);
         }
         #endregion
         #region plugins

@@ -8,13 +8,17 @@ namespace ApiSix.CSharp.Sdk.Test
 {
     public class Tests
     {
-        private String endpoint = "192.168.3.128:9180";
-        private String version = "3.3.0";
-        private String apiKey = "edd1c9f034335f136f87ad84b625c8f1";
+        private AdminClient adminClient;
 
         [SetUp]
         public void Setup()
         {
+            Setting.Current.Endpoint = "192.168.3.128:9180";
+            Setting.Current.Version = "3.3.0";
+            Setting.Current.ApiKey = "edd1c9f034335f136f87ad84b625c8f1";
+            Setting.Current.Save();
+
+            adminClient = new AdminClient();
         }
 
         [Test]
@@ -25,10 +29,6 @@ namespace ApiSix.CSharp.Sdk.Test
         [Test]
         public void testUpstream()
         {
-            Credential credential = new DefaultCredential(apiKey);
-            Profile profile = DefaultProfile.getProfile(endpoint, version, credential);
-            AdminClient adminClient = new AdminClient(profile);
-
             var id = "2";
             var upstream = new Upstream();
             upstream.id = id;
@@ -101,10 +101,6 @@ namespace ApiSix.CSharp.Sdk.Test
         [Test]
         public void testService()
         {
-            Credential credential = new DefaultCredential(apiKey);
-            Profile profile = DefaultProfile.getProfile(endpoint, version, credential);
-            AdminClient adminClient = new AdminClient(profile);
-
             var id = "2";
             Service service = new Service();
             service.name = "servicename" + id;
@@ -174,10 +170,6 @@ namespace ApiSix.CSharp.Sdk.Test
         [Test]
         public void testRoute()
         {
-            Credential credential = new DefaultCredential(apiKey);
-            Profile profile = DefaultProfile.getProfile(endpoint, version, credential);
-            AdminClient adminClient = new AdminClient(profile);
-
             var list1 = adminClient.listRoutes();
 
             //创建upstream
@@ -281,10 +273,6 @@ namespace ApiSix.CSharp.Sdk.Test
         [Test]
         public void testK8sInfo()
         {
-            Credential credential = new DefaultCredential(apiKey);
-            Profile profile = DefaultProfile.getProfile(endpoint, version, credential);
-            AdminClient adminClient = new AdminClient(profile);
-
             //创建upstream
             Upstream upstream = new Upstream();
             Dictionary<String, int> nodes = new Dictionary<String, int>();
@@ -367,10 +355,6 @@ namespace ApiSix.CSharp.Sdk.Test
         [Test]
         public void testConsumer()
         {
-            Credential credential = new DefaultCredential(apiKey);
-            Profile profile = DefaultProfile.getProfile(endpoint, version, credential);
-            AdminClient adminClient = new AdminClient(profile);
-
             var csms = adminClient.listConsumers();
 
             var username = "test";
@@ -420,10 +404,6 @@ namespace ApiSix.CSharp.Sdk.Test
         [Test]
         public void testSSL()
         {
-            Credential credential = new DefaultCredential(apiKey);
-            Profile profile = DefaultProfile.getProfile(endpoint, version, credential);
-            AdminClient adminClient = new AdminClient(profile);
-
             String id = "2";
             SSL ssl = new SSL();
 

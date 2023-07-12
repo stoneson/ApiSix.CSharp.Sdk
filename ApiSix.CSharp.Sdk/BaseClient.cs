@@ -149,7 +149,7 @@ namespace ApiSix.CSharp
                 if (page < 1) page = 1;
                 if (pageSize < 10) page = 10;
                 if (pageSize > 50) page = 50;
-                var ress = this.doRequest(HttpProfile.REQ_GET, $"/apisix/admin/{path}?page={page}&page_size={pageSize}");
+                var ress = this.doRequest(HttpProfile.REQ_GET, $"/apisix/admin/{path.Trim('/')}?page={page}&page_size={pageSize}");
                 rsp = ress.DeserializeObjectByJson<Multi<T>>();
             }
             catch (Exception e)
@@ -177,7 +177,7 @@ namespace ApiSix.CSharp
             Multi<T> rsp = null;
             try
             {
-                var ress = this.doRequest(HttpProfile.REQ_GET, $"/apisix/admin/{path}");
+                var ress = this.doRequest(HttpProfile.REQ_GET, $"/apisix/admin/{path.Trim('/')}");
                 rsp = ress.DeserializeObjectByJson<Multi<T>>();
             }
             catch (Exception e)
@@ -208,7 +208,7 @@ namespace ApiSix.CSharp
             Item<T> rsp = null;
             try
             {
-                var ress = this.doRequest(HttpProfile.REQ_GET, $"/apisix/admin/{path}/" + id);
+                var ress = this.doRequest(HttpProfile.REQ_GET, $"/apisix/admin/{path.Trim('/')}/" + id);
                 rsp = ress.DeserializeObjectByJson<Item<T>>();
             }
             catch (Exception e)
@@ -236,7 +236,7 @@ namespace ApiSix.CSharp
         {
             try
             {
-                this.doRequest(HttpProfile.REQ_DELETE, $"/apisix/admin/{path}/" + id);
+                this.doRequest(HttpProfile.REQ_DELETE, $"/apisix/admin/{path.Trim('/')}/" + id);
                 return true;
             }
             catch (Exception e)
@@ -266,7 +266,7 @@ namespace ApiSix.CSharp
             Item<T> rsp = null;
             try
             {
-                var ress = this.doRequest(model, HttpProfile.REQ_PUT, $"/apisix/admin/{path}/" + id);
+                var ress = this.doRequest(model, HttpProfile.REQ_PUT, $"/apisix/admin/{path.Trim('/')}/" + id);
                 rsp = ress.DeserializeObjectByJson<Item<T>>();
             }
             catch (Exception e)
@@ -296,7 +296,7 @@ namespace ApiSix.CSharp
             Item<T> rsp = null;
             try
             {
-                var ress = this.doRequest(model, HttpProfile.REQ_POST, $"/apisix/admin/{path}/");
+                var ress = this.doRequest(model, HttpProfile.REQ_POST, $"/apisix/admin/{path.Trim('/')}/");
                 rsp = ress.DeserializeObjectByJson<Item<T>>();
             }
             catch (Exception e)
@@ -325,13 +325,13 @@ namespace ApiSix.CSharp
         /// <param name="path"></param>
         /// <returns></returns>
         /// <exception cref="ApisixSDKExcetion"></exception>
-        public Item<T> patchById<T>(String id, object model, String path) where T : BaseModel
+        public Item<T> patchById<T>(String id, object model, String path, string subPath = "") where T : BaseModel
         {
             Item<T> rsp = null;
             try
             {
                 var strParam = model == null ? "" : model.SerializeObjectToJson();
-                var strResp = doRequest(HttpProfile.REQ_PATCH, $"/apisix/admin/{path}/" + id, strParam);
+                var strResp = doRequest(HttpProfile.REQ_PATCH, $"/apisix/admin/{path.Trim('/')}/" + id.Trim('/') + (string.IsNullOrWhiteSpace(subPath) ? "" : "/" + subPath.Trim('/')), strParam);
                 rsp = strResp.DeserializeObjectByJson<Item<T>>();
                 //var ress = this.doRequest(model, HttpProfile.REQ_PATCH, $"/apisix/admin/{path}/" + id);
                 //rsp = ress.DeserializeObjectByJson<Item<T>>();
