@@ -107,9 +107,13 @@ namespace ApiSix.CSharp
             {
                 return RestClient.HttpRequestPUT(url, param, contentType, headers);
             }
+            else if (reqMethod.Equals(HttpProfile.REQ_PATCH))
+            {
+                return RestClient.HttpRequestPATCH(url, param, contentType, headers);
+            }
             else
             {
-                throw new ApisixSDKExcetion("Method only support (GET, POST, PUT, DELETE)");
+                throw new ApisixSDKExcetion("Method only support (GET, POST, PUT,PATCH, DELETE)");
             }
         }
         #endregion

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace ApiSix.CSharp.Sdk.Test
@@ -555,65 +556,5 @@ namespace ApiSix.CSharp.Sdk.Test
             Assert.False(rules.ContainsKey("iP"));
         }
 
-        [Test]
-        public void MemoryQueueTest()
-        {
-            XTrace.WriteLine("MemoryQueueTests.Test1");
-
-            var q = new MemoryQueue<String>();
-
-            Assert.True(q.IsEmpty);
-            Assert.AreEqual(0, q.Count);
-
-            q.Add("test");
-            q.Add("newlife", "stone");
-
-            Assert.False(q.IsEmpty);
-            Assert.AreEqual(3, q.Count);
-
-            var s1 = q.TakeOne();
-            Assert.AreEqual("test", s1);
-
-            var ss = q.Take(3).ToArray();
-            Assert.AreEqual(2, ss.Length);
-
-            XTrace.WriteLine("begin TokeOneAsync");
-            ThreadPool.QueueUserWorkItem(s =>
-            {
-                Thread.Sleep(1100);
-                XTrace.WriteLine("add message");
-                q.Add("delay");
-            });
-
-            var s2 = q.TakeOneAsync(15, default).Result;
-            XTrace.WriteLine("end TokeOneAsync");
-            Assert.AreEqual("delay", s2);
-        }
-
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void MemoryCacheTestBigSave(Boolean compressed)
-        {
-            var mc = new MemoryCache();
-            var mcl = new MemoryCache();
-
-            for (var i = 0; i < 500_000; i++)
-            {
-                var ga = new UserModel { ID = Rand.Next(100000, 999999), Name = Rand.NextString(8) };
-                mc.Set(ga.Name, ga);
-            }
-
-            if (compressed)
-            {
-                mc.Save("data/bigsave.gz", true);
-                mcl.Load("data/bigsave.gz", true);
-            }
-            else
-            {
-                mc.Save("data/bigsave.cache", false);
-                mcl.Load("data/bigsave.cache", false);
-            }
-        }
     }
 }

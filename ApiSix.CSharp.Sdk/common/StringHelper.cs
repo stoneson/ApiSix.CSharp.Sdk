@@ -13,6 +13,7 @@ namespace ApiSix.CSharp
     public static class StringHelper
     {
         #region 字符串扩展
+       
         /// <summary>忽略大小写的字符串相等比较，判断是否与任意一个待比较字符串相等</summary>
         /// <param name="value">字符串</param>
         /// <param name="strs">待比较字符串数组</param>
@@ -363,6 +364,17 @@ namespace ApiSix.CSharp
         public static string[] Split(this String value, char separator, StringSplitOptions options = StringSplitOptions.None)
         {
             return value.Split(new char[] { separator }, options);
+        }
+        /// <summary>
+        /// Splits a string into substrings based on the characters in an array. You can specify whether the substrings include empty array elements.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static string[] Split(this String value, string separator, StringSplitOptions options)
+        {
+            return value.Split(separator?.ToCharArray(), options);
         }
 #endif
         #endregion

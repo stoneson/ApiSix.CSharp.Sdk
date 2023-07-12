@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -11,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace ApiSix.CSharp
@@ -39,7 +41,7 @@ namespace ApiSix.CSharp
         public static byte[] SerializeObject(this object value)
         {
             if (value == null) return null;
-            
+
             return UTF8Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, timeFormat));
         }
 
@@ -61,7 +63,7 @@ namespace ApiSix.CSharp
         }
         public static object DeserializeObjectByJson(this string value, Type type)
         {
-            if (value==null) return null;
+            if (string.IsNullOrWhiteSpace(value)) return null;
             ////使用另一个序列化器来进行反序列化
             //JsonSerializer serializer = new JsonSerializer();
             ////把我们自定义的JsonConverter放进序列化器(相当于告诉序列化器该怎么序列化)
@@ -101,7 +103,18 @@ namespace ApiSix.CSharp
             string jsonStr = JsonConvert.SerializeObject(dict);
             return jsonStr;
         }
+        /// <summary>Json类型对象转换实体类</summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T ConvertObject<T>(this Object obj)
+        {
+            if (obj == null) return default;
+            if (obj is T t) return t;
+            if (obj.GetType().As<T>()) return (T)obj;
 
+            var objJs = obj.ToJson();
+            return objJs.DeserializeObjectByJson<T>();
+        }
         /// <summary>
         /// 将json字符串反序列化为字典类型
         /// </summary>
@@ -109,7 +122,7 @@ namespace ApiSix.CSharp
         /// <typeparam name="TValue">字典value</typeparam>
         /// <param name="jsonStr">json字符串</param>
         /// <returns>字典数据</returns>
-        public static Dictionary<TKey, TValue> DeserializeStringToDictionary<TKey, TValue>(this  string jsonStr)
+        public static Dictionary<TKey, TValue> DeserializeStringToDictionary<TKey, TValue>(this string jsonStr)
         {
             if (string.IsNullOrWhiteSpace(jsonStr))
                 return new Dictionary<TKey, TValue>();
@@ -146,7 +159,7 @@ namespace ApiSix.CSharp
         /// <typeparam name="TValue"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static T ToEntity<T>(this JObject jobj)where T : class
+        public static T ToEntity<T>(this JObject jobj) where T : class
         {
             if (jobj == null)
                 return default(T);
@@ -166,7 +179,7 @@ namespace ApiSix.CSharp
                 var val = item.Value;
                 if (val != null)
                 {
-                   var property= type.GetJsonProperty(item.Key);
+                    var property = type.GetJsonProperty(item.Key);
                     if (property == null) continue;
                     try
                     {

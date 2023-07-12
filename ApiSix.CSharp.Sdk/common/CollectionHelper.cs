@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Dynamic;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace ApiSix.CSharp
 {
@@ -341,6 +342,35 @@ namespace ApiSix.CSharp
                 yield return item;
             }
         }
+        /// <summary>从并发字典中删除</summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static Boolean Remove<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key) => dict.TryRemove(key, out _);
+
+        /// <summary>线程安全，搜索并返回第一个，支持遍历中修改元素</summary>
+        /// <param name="list">实体列表</param>
+        /// <param name="match">条件</param>
+        /// <returns></returns>
+        public static T Find<T>(this IList<T> list, Predicate<T> match)
+        {
+            if (list is List<T> list2) return list2.Find(match);
+
+            return list.ToArray().FirstOrDefault(e => match(e));
+        }
+
+        /// <summary>线程安全，搜索并返回第一个，支持遍历中修改元素</summary>
+        /// <param name="list">实体列表</param>
+        /// <param name="match">条件</param>
+        /// <returns></returns>
+        public static IList<T> FindAll<T>(this IList<T> list, Predicate<T> match)
+        {
+            if (list is List<T> list2) return list2.FindAll(match);
+
+            return list.ToArray().Where(e => match(e)).ToList();
+        }
 
         /// <summary>分析Json字符串得到字典</summary>
         /// <param name="json"></param>
@@ -349,6 +379,13 @@ namespace ApiSix.CSharp
         {
             var jobj = json.ToObject<object>();
             return jobj.ToDictionary();
+        }
+        /// <summary>分析xml字符串得到字典</summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static IDictionary<String, Object> DecodeXml(this String xml)
+        {
+            return XmlParser.Decode(xml);
         }
     }
 }

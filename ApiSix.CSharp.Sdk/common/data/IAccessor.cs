@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 
 namespace ApiSix.CSharp
 {
@@ -79,4 +81,5 @@ namespace ApiSix.CSharp
             return obj;
         }
     }
+
 }

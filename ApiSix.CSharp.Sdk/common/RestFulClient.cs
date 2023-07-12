@@ -129,6 +129,7 @@ namespace ApiSix.CSharp
         GET,
         POST,
         PUT,
+        PATCH,
         DELETE
     }
 
@@ -298,6 +299,19 @@ namespace ApiSix.CSharp
             , IDictionary<string, string> headers = null, string webProxyAddress = "")
         {
             return HttpRequest(EnumHttpVerb.PUT, url, postData, contentType, null, headers, webProxyAddress);
+        }
+        /// <summary>
+        /// Http (PATCH)
+        /// </summary>
+        /// <param name="url">请求URL</param>
+        /// <param name="postData">Post 数据</param>
+        /// <param name="contentType">TTP 标头的值</param>
+        /// <param name="headers">HTTP 标头的名称/值对的集合</param>
+        /// <returns>响应内容</returns>
+        public static string HttpRequestPATCH(string url, string postData, string contentType = "application/json"
+            , IDictionary<string, string> headers = null, string webProxyAddress = "")
+        {
+            return HttpRequest(EnumHttpVerb.PATCH, url, postData, contentType, null, headers, webProxyAddress);
         }
         /// <summary>
         ///  Http (DELETE)
