@@ -7,12 +7,8 @@ namespace ApiSix.CSharp.model
     /// <summary>
     /// 你可以使用 Plugin Config 资源创建一组可以在路由间复用的插件。
     /// </summary>
-    public class PluginConfig : BaseModel
-    { /// <summary>
-      /// 服务ID
-      /// </summary>
-        [JsonProperty("id")]
-        public String id { get; set; }
+    public class PluginConfig : BaseBody
+    { 
         /// <summary>
         /// 服务名称
         /// </summary>
@@ -34,15 +30,5 @@ namespace ApiSix.CSharp.model
         /// </summary>
         [JsonProperty("labels")]
         public Dictionary<String, String> labels { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒，如果不指定则自动创建
-        /// </summary>
-        [JsonProperty("create_time")]
-        public long? createTime { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒，如果不指定则自动创建
-        /// </summary>
-        [JsonProperty("update_time")]
-        public long? updateTime { get; set; }
     }
 }

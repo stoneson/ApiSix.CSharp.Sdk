@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,10 +13,8 @@ namespace ApiSix.CSharp.model
     /// Upstream 是虚拟主机抽象，对给定的多个服务节点按照配置规则进行负载均衡。
     /// Upstream 的地址信息可以直接配置到 Route（或 Service) 上，当 Upstream 有重复时，需要用“引用”方式避免重复。
     /// </summary>
-    public class Upstream : BaseModel
+    public class Upstream : BaseBody
     {
-        [JsonProperty("id")]
-        public String id { get; set; }
         /// <summary>
         /// 标识上游服务名称、使用场景等
         /// </summary>
@@ -53,6 +52,8 @@ namespace ApiSix.CSharp.model
         /// </summary>
         [JsonProperty("discovery_type")]
         public string discoveryType { get; set; }
+        [JsonProperty("discovery_args")]
+        public Dictionary<String, string> discoveryArgs { get; set; }
         /// <summary>
         /// 该选项只有类型是 chash 才有效。根据 key 来查找对应的节点 id，相同的 key 在同一个对象中，则返回相同 id。
         /// 目前支持的 NGINX 内置变量有 uri, server_name, server_addr, request_uri, remote_port, remote_addr, query_string, host, hostname, arg_***，
@@ -105,7 +106,7 @@ namespace ApiSix.CSharp.model
         public checksInfo checks { get; set; }
 
         [JsonProperty("keepalive_pool")]
-        public keepalivePoolInfo keepalivePool { get; set; }
+        public UpstreamKeepalivePool keepalivePool { get; set; }
 
         [JsonProperty("k8s_deployment_info")]
         public K8sDeploymentInfo k8sDeploymentInfo { get; set; }
@@ -115,14 +116,9 @@ namespace ApiSix.CSharp.model
         /// </summary>
         [JsonProperty("labels")]
         public Dictionary<String, String> labels { get; set; }
-        [JsonProperty("create_time")]
-        public long? createTime { get; set; }
-
-        [JsonProperty("update_time")]
-        public long? updateTime { get; set; }
 
         [JsonProperty("tls")]
-        public tlsInfo tls { get; set; }
+        public UpstreamTLSInfo tls { get; set; }
     }
     /**
      * type 详细信息如下：
@@ -209,7 +205,7 @@ namespace ApiSix.CSharp.model
     /// <summary>
     /// 
     /// </summary>
-    public class keepalivePoolInfo
+    public class UpstreamKeepalivePool
     {
         /// <summary>
         /// 	动态设置 keepalive_timeout 指令，详细信息请参考下文。
@@ -230,7 +226,7 @@ namespace ApiSix.CSharp.model
     /// <summary>
     /// 证书
     /// </summary>
-    public class tlsInfo
+    public class UpstreamTLSInfo
     {
         /// <summary>
         /// 设置跟上游通信时的客户端证书，详细信息请参考下文
@@ -255,58 +251,192 @@ namespace ApiSix.CSharp.model
     {
         [JsonProperty("active")]
         public checksActiveInfo active { get; set; }
+        [JsonProperty("passive")]
+        public checksPassiveInfo passive { get; set; }
     }
+    /// <summary>
+    /// 健康检查 主动健康检查
+    /// 本文主要介绍了 Apache APISIX 的健康检查功能。健康检查功能可以在上游节点发生故障或者迁移时，将请求代理到健康的节点上，最大程度避免服务不可用的问题。APISIX 的健康检查功能使用 lua-resty-healthcheck 实现，并分为主动检查和被动检查。
+    /// 主动健康检查#
+    /// 主动健康检查主要是指 APISIX 通过预设的探针类型，主动探测上游节点的存活性。目前 APISIX 支持 HTTP、HTTPS、TCP 三种探针类型。
+    /// 当发向健康节点 A 的 N 个连续探针都失败时（取决于如何配置），则该节点将被标记为不健康，不健康的节点将会被 APISIX 的负载均衡器忽略，无法收到请求；若某个不健康的节点，连续 M 个探针都成功，则该节点将被重新标记为健康，进而可以被代理。
+    /// 被动健康检查#
+    /// 被动健康检查是指，通过判断从 APISIX 转发到上游节点的请求响应状态，来判断对应的上游节点是否健康。相对于主动健康检查，被动健康检查的方式无需发起额外的探针，但是也无法提前感知节点状态，可能会有一定量的失败请求。
+    /// 若发向健康节点 A 的 N 个连续请求都被判定为失败（取决于如何配置），则该节点将被标记为不健康。
+    ///  注意
+    /// 由于不健康的节点无法收到请求，仅使用被动健康检查策略无法重新将节点标记为健康，因此通常需要结合主动健康检查策略。
+    /// 提示
+    /// 只有在 upstream 被请求时才会开始健康检查，如果 upstream 被配置但没有被请求，不会触发启动健康检查。
+    /// 如果没有健康的节点，那么请求会继续发送给上游。
+    /// 如果 upstream 中只有一个节点时不会触发启动健康检查，该唯一节点无论是否健康，请求都将转发给上游。
+    /// 
+    /// https://apisix.apache.org/zh/docs/apisix/tutorials/health-check/
+    /// </summary>
     public class checksActiveInfo
     {
-        [JsonProperty("port")]
-        public int? port { get; set; }
-
+        /// <summary>
+        /// 主动检查的类型，支持 HTTP、HTTPS、TCP 三种探针类型
+        /// </summary>
+        [JsonProperty("type")]
+        public String type { get; set; } = "http";
+        /// <summary>
+        /// 主动检查的超时时间（单位为秒）
+        /// </summary>
         [JsonProperty("timeout")]
-        public int? timeout { get; set; }
-
+        public int? timeout { get; set; } = 1;
+        /// <summary>
+        /// 主动检查的 HTTP 请求主机名。
+        /// ${upstream.node.host}
+        /// </summary>
         [JsonProperty("host")]
         public String host { get; set; }
-
+        /// <summary>
+        /// 主动检查的 HTTP 请求主机端口。
+        /// ${upstream.node.port}
+        /// </summary>
+        [JsonProperty("port")]
+        public int? port { get; set; }
+        /// <summary>
+        /// 主动检查的 HTTP 请求路径。
+        /// </summary>
         [JsonProperty("http_path")]
-        public String httpPath { get; set; }
-
-        [JsonProperty("type")]
-        public String type { get; set; }
-
+        public String httpPath { get; set; } = "/";
+        /// <summary>
+        /// 主动检查时同时检查的目标数
+        /// </summary>
         [JsonProperty("concurrency")]
-        public int? concurrency { get; set; }
-
+        public int? concurrency { get; set; } = 10;
+        /// <summary>
+        /// 主动检查使用 HTTPS 类型检查时，是否检查远程主机的 SSL 证书
+        /// </summary>
+        [JsonProperty("https_verify_certificate")]
+        public bool? httpsVerifyCertificate { get; set; }
+        /// <summary>
+        /// 主动检查使用 HTTP 或 HTTPS 类型检查时，设置额外的请求头信息
+        /// </summary>
+        [JsonProperty("req_headers")]
+        public List<string> reqHeaders { get; set; }
+        /// <summary>
+        /// 主动检查（健康节点）
+        /// </summary>
         [JsonProperty("healthy")]
         public checksActiveHealthyInfo healthy { get; set; }
 
         [JsonProperty("unhealthy")]
         public checksActiveUnhealthyInfo unhealthy { get; set; }
     }
-
+    /// <summary>
+    /// 主动检查（健康节点）
+    /// </summary>
     public class checksActiveHealthyInfo
     {
+        /// <summary>
+        /// 主动检查（健康节点）检查的间隔时间（单位为秒
+        /// </summary>
         [JsonProperty("interval")]
         public int? interval { get; set; } = 1;
-
+        /// <summary>
+        /// 主动检查（健康节点）确定节点健康的次数。
+        /// </summary>
         [JsonProperty("successes")]
         public int? successes { get; set; } = 2;
-
+        /// <summary>
+        /// 主动检查（健康节点）HTTP 或 HTTPS 类型检查时，健康节点的 HTTP 状态码。
+        /// </summary>
         [JsonProperty("http_statuses")]
         public List<int> httpStatuses { get; set; }// = new List<int>();// { 200, 302 };
     }
+    /// <summary>
+    /// 主动检查（非健康节点）
+    /// </summary>
     public class checksActiveUnhealthyInfo
     {
+        /// <summary>
+        /// 主动检查（非健康节点）检查的间隔时间（单位为秒）
+        /// </summary>
         [JsonProperty("interval")]
         public int? interval { get; set; } = 1;
-
+        /// <summary>
+        /// 主动检查（非健康节点）确定节点非健康的超时次数。
+        /// </summary>
         [JsonProperty("timeouts")]
         public int? timeouts { get; set; } = 3;
+        /// <summary>
+        /// 主动检查（非健康节点）HTTP 或 HTTPS 类型检查时，确定节点非健康的次数
+        /// </summary>
         [JsonProperty("http_failures")]
         public int? httpFailures { get; set; } = 5;
-
+        /// <summary>
+        /// 主动检查（非健康节点）TCP 类型检查时，确定节点非健康的次数。
+        /// </summary>
         [JsonProperty("tcp_failures")]
         public int? tcpFailures { get; set; } = 3;
+        /// <summary>
+        /// 主动检查（非健康节点）HTTP 或 HTTPS 类型检查时，非健康节点的 HTTP 状态码。
+        /// </summary>
+        [JsonProperty("http_statuses")]
+        public List<int> httpStatuses { get; set; }// = new List<int>();// { 429, 404, 500, 501, 502, 503, 504, 505 };
+    }
 
+    /// <summary>
+    /// 健康检查  被动检查类。
+    /// </summary>
+    public class checksPassiveInfo
+    {
+        /// <summary>
+        /// 被动检查的类型，支持 HTTP、HTTPS、TCP 三种探针类型
+        /// </summary>
+        [JsonProperty("type")]
+        public String type { get; set; } = "http";
+        
+        /// <summary>
+        /// 主动检查（健康节点）
+        /// </summary>
+        [JsonProperty("healthy")]
+        public checksPassiveHealthyInfo healthy { get; set; }
+
+        [JsonProperty("unhealthy")]
+        public checksPassiveUnhealthyInfo unhealthy { get; set; }
+    }
+    /// <summary>
+    /// 被动检查（健康节点）
+    /// </summary>
+    public class checksPassiveHealthyInfo
+    {
+        /// <summary>
+        /// 被动检查（健康节点）确定节点健康的次数。
+        /// </summary>
+        [JsonProperty("successes")]
+        public int? successes { get; set; } = 2;
+        /// <summary>
+        /// 被动检查（健康节点）HTTP 或 HTTPS 类型检查时，健康节点的 HTTP 状态码
+        /// </summary>
+        [JsonProperty("http_statuses")]
+        public List<int> httpStatuses { get; set; }// = new List<int>();// { 200, 302 };
+    }
+    /// <summary>
+    /// 被动检查（非健康节点）
+    /// </summary>
+    public class checksPassiveUnhealthyInfo
+    {
+        /// <summary>
+        /// 被动检查（非健康节点）确定节点非健康的超时次数。
+        /// </summary>
+        [JsonProperty("timeouts")]
+        public int? timeouts { get; set; } = 3;
+        /// <summary>
+        /// 被动检查（非健康节点）HTTP 或 HTTPS 类型检查时，确定节点非健康的次数
+        /// </summary>
+        [JsonProperty("http_failures")]
+        public int? httpFailures { get; set; } = 5;
+        /// <summary>
+        /// 被动检查（非健康节点）TCP 类型检查时，确定节点非健康的次数。
+        /// </summary>
+        [JsonProperty("tcp_failures")]
+        public int? tcpFailures { get; set; } = 3;
+        /// <summary>
+        /// 被动检查（非健康节点）HTTP 或 HTTPS 类型检查时，非健康节点的 HTTP 状态码。
+        /// </summary>
         [JsonProperty("http_statuses")]
         public List<int> httpStatuses { get; set; }// = new List<int>();// { 429, 404, 500, 501, 502, 503, 504, 505 };
     }

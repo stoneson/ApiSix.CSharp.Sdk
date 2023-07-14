@@ -13,9 +13,8 @@ namespace ApiSix.CSharp.model
     /// 对于同一类参数比如 uri与 uris，upstream 与 upstream_id，host 与 hosts，remote_addr 与 remote_addrs 等，是不能同时存在，二者只能选择其一。如果同时启用，则会出现异常。
     /// 在 vars 中，当获取 Cookie 的值时，Cookie name 是区分大小写字母的。例如：var = cookie_x_foo 与 var = cookie_X_Foo 表示不同的 cookie。
     /// </summary>
-    public class Route : BaseModel
+    public class Route : BaseBody
     {
-        public String id { get; set; }
         /// <summary>
         /// 路由名称最大长度应仅为 100
         /// </summary>
@@ -122,17 +121,7 @@ namespace ApiSix.CSharp.model
         /// function(vars) return vars["arg_name"] == "json" end
         /// </summary>
         [JsonProperty("filter_func")]
-        public String filter_func { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒。如果不指定则自动创建
-        /// </summary>
-        [JsonProperty("create_time")]
-        public long? createTime { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒。如果不指定则自动创建
-        /// </summary>
-        [JsonProperty("update_time")]
-        public long? updateTime { get; set; }
+        public String filterFunc { get; set; }
         /// <summary>
         /// 标识附加属性的键值对
         /// {"version":"v2","build":"16","env":"production"}
@@ -149,7 +138,14 @@ namespace ApiSix.CSharp.model
         /// 当设置为 true 时，启用 websocket(boolean), 默认值为 false。
         /// </summary>
         [JsonProperty("enable_websocket\t")]
-        public bool enable_websocket { get; set; }
+        public bool enableWebsocket { get; set; }
+
+        [JsonProperty("script_id")]
+        public String scriptID { get; set; }
+        [JsonProperty("script")]
+        public String script { get; set; }
+        [JsonProperty("plugin_config_id")]
+        public String pluginConfigID { get; set; }
     }
 
     /**

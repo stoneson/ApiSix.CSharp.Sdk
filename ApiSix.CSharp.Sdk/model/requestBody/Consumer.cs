@@ -9,9 +9,8 @@ namespace ApiSix.CSharp.model
     /// Consumer 是某类服务的消费者，需要与用户认证体系配合才能使用。
     /// Consumer 使用 username 作为唯一标识，仅支持使用 HTTP PUT 方法创建 Consumer。
     /// </summary>
-    public class Consumer : BaseModel
+    public class Consumer : BaseBody
     {
-        public String id { get; set; }
         /// <summary>
         ///  名称。
         /// </summary>
@@ -39,16 +38,6 @@ namespace ApiSix.CSharp.model
         /// </summary>
         [JsonProperty("labels")]
         public Dictionary<String, String> labels { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒。如果不指定则自动创建
-        /// </summary>
-        [JsonProperty("create_time")]
-        public long? createTime { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒。如果不指定则自动创建。
-        /// </summary>
-        [JsonProperty("update_time")]
-        public long? updateTime { get; set; }
     }
     /**
      * Consumer 对象 JSON 配置示例：

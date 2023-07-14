@@ -18,7 +18,7 @@ namespace webapi2.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet("/WeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -28,6 +28,17 @@ namespace webapi2.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+        /// <summary>
+        /// ½¡¿µ¼ì²é
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("/Health")]
+        public string Health()
+        {
+            var Server = HttpContext.Request.Headers["Host"];
+            ApiSix.CSharp.XTrace.WriteLine(Server + " Ok2 @ " + DateTime.Now.ToString("yyyyy-MM-dd HH:mm:ss.fff"));
+            return "Ok2 @ "+DateTime.Now.ToString("yyyyy-MM-dd HH:mm:ss.fff");
         }
     }
 }

@@ -8,13 +8,8 @@ namespace ApiSix.CSharp.model
     /// Service 是某类 API 的抽象（也可以理解为一组 Route 的抽象）。
     /// 它通常与上游服务抽象是一一对应的，Route 与 Service 之间，通常是 N:1 的关系。
     /// </summary>
-    public class Service : BaseModel
+    public class Service : BaseBody
     {
-        /// <summary>
-        /// 服务ID
-        /// </summary>
-        [JsonProperty("id")]
-        public String id { get; set; }
         /// <summary>
         /// 服务名称
         /// </summary>
@@ -52,22 +47,12 @@ namespace ApiSix.CSharp.model
         /// 当设置为 true 时，启用 websocket(boolean), 默认值为 false。
         /// </summary>
         [JsonProperty("enable_websocket\t")]
-        public bool enable_websocket { get; set; }
+        public bool enableWebsocket { get; set; }
         /// <summary>
         /// 非空列表形态的 host，表示允许有多个不同 host，匹配其中任意一个即可。
         /// </summary>
         [JsonProperty("hosts")]
         public List<String> hosts { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒。如果不指定则自动创建
-        /// </summary>
-        [JsonProperty("create_time")]
-        public long? createTime { get; set; }
-        /// <summary>
-        /// epoch 时间戳，单位为秒。如果不指定则自动创建
-        /// </summary>
-        [JsonProperty("update_time")]
-        public long? updateTime { get; set; }
     }
 
     /**

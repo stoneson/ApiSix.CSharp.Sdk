@@ -19,7 +19,7 @@ using System.Net;
 
 namespace ApiSix.CSharp.Sdk.Test
 {
-    public class Tests
+    public class AdminClientTest
     {
         private AdminClient adminClient;
 
